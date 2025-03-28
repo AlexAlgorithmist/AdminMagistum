@@ -17,48 +17,48 @@ class SCHEDULE_STATIC:
     make = """
     CREATE TABLE IF NOT EXISTS schedule_static (
         lesson_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        place INTEGER,
-        person INTEGER,
-        type INTEGER,
-        day INTEGER,
+        place_id INTEGER,
+        person_id INTEGER,
+        type_id INTEGER,
+        day_id INTEGER,
         time_begin INTEGER,
         time_end INTEGER,
-        FOREIGN KEY (place) REFERENCES places(id),
-        FOREIGN KEY (person) REFERENCES people(id),
-        FOREIGN KEY (type) REFERENCES lessons_types(id),
-        FOREIGN KEY (day) REFERENCES days(id)
+        FOREIGN KEY (place_id) REFERENCES places(id),
+        FOREIGN KEY (person_id) REFERENCES people(id),
+        FOREIGN KEY (type_id) REFERENCES lessons_types(id),
+        FOREIGN KEY (day_id) REFERENCES days(id)
     );
     """
     add = """
     INSERT INTO
-        schedule_static (place, person, type, day, time_begin, time_end)
+        schedule_static (place_id, person_id, type_id, day_id, time_begin, time_end)
     VALUES
         (?, ?, ?, ?, ?, ?)
     """
     drop = """DROP TABLE schedule_static"""
     select_by_person = """
     SELECT
-        lesson_id, place, type, day, time_begin, time_end
+        lesson_id, place_id, type_id, day_id, time_begin, time_end
     FROM
         schedule_static
     WHERE
-        person = ?
+        person_id = ?
     """
     select_by_day = """
     SELECT
-        lesson_id, place, person, type, time_begin, time_end
+        lesson_id, place_id, person_id, type_id, time_begin, time_end
     FROM
         schedule_static
     WHERE
-        day = ?
+        day_id = ?
     """
     select_by_person_and_day = """
     SELECT
-        lesson_id, place, type, time_begin, time_end
+        lesson_id, place_id, type_id, time_begin, time_end
     FROM
         schedule_static
     WHERE
-        person = ? and day = ?
+        person_id = ? and day_id = ?
     """
 
 
@@ -366,6 +366,7 @@ class PEOPLE_ROLES:
     """
 
 
+# TODO: change it. Because now it`s not important.
 @dataclass
 class SCHEDULE_LOCAL:
     make = """
@@ -420,37 +421,37 @@ class SCHEDULE_LOCAL:
 class BREAKS:
     make = """
     CREATE TABLE IF NOT EXISTS breaks (
-        break_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        place INTEGER,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        place_id INTEGER,
         year_from INTEGR,
         month_from INTEGR,
         day_from INTEGR,
         year_to INTEGR,
         month_to INTEGR,
         day_to INTEGR,
-        FOREIGN KEY (place) REFERENCES places(id)
+        FOREIGN KEY (place_id) REFERENCES places(id)
     );
     """
     add = """
     INSERT INTO
-        breaks (place, year_from, month_from, day_from, year_to, month_to, day_to)
+        breaks (place_id, year_from, month_from, day_from, year_to, month_to, day_to)
     VALUES
         (?, ?, ?, ?, ?, ?, ?)
     """
     drop = """DROP TABLE breaks"""
     select_all = """
     SELECT
-        place, year_from, month_from, day_from, year_to, month_to, day_to
+        place_id, year_from, month_from, day_from, year_to, month_to, day_to
     FROM
         breaks
     """
     get_by_id = """
     SELECT
-        place, year_from, month_from, day_from, year_to, month_to, day_to
+        place_id, year_from, month_from, day_from, year_to, month_to, day_to
     FROM
         breaks
     WHERE
-        break_id = ?
+        id = ?
     """
     get_by_place = """
     SELECT
@@ -458,7 +459,7 @@ class BREAKS:
     FROM
         breaks
     WHERE
-        place = ?
+        place_id = ?
     """
 
 
@@ -466,29 +467,45 @@ class BREAKS:
 class CHANGES:
     make = """
     CREATE TABLE IF NOT EXISTS changes (
-        change_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         lesson_id INTEGER,
-        change_person INTEGER,
+        changer_id INTEGER,
         year INTEGR,
         month INTEGR,
         day INTEGR,
         comment TEXT,
         FOREIGN KEY (lesson_id) REFERENCES schedule_static(lesson_id),
-        FOREIGN KEY (change_person) REFERENCES people(id)
+        FOREIGN KEY (changer_id) REFERENCES people(id)
     );
     """
     add = """
     INSERT INTO
-        changes (lesson_id, change_person, year, month, day, comment)
+        changes (lesson_id, changer_id, year, month, day, comment)
     VALUES
         (?, ?, ?, ?, ?, ?)
     """
     drop = """DROP TABLE changes"""
     select_all = """
     SELECT
-        lesson_id, change_person, year, month, day
+        lesson_id, changer_id, year, month, day, comment
     FROM
         changes
+    """
+    change_by_lesson = """
+    SELECT
+        changer_id, year, month, day, comment
+    FROM
+        changes
+    WHERE
+        lesson_id = ?
+    """
+    changes_by_changer = """
+    SELECT
+        lesson_id, year, month, day, comment
+    FROM
+        changes
+    WHERE
+        changer_id = ?
     """
 
 
@@ -496,35 +513,35 @@ class CHANGES:
 class PEOPLE_RIGHTS:
     make = """
     CREATE TABLE IF NOT EXISTS people_rights (
-        right_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        person INTEGER,
-        action INTEGER,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        person_id INTEGER,
+        action_id INTEGER,
         table_id INTEGER,
-        FOREIGN KEY (person) REFERENCES people(id),
-        FOREIGN KEY (action) REFERENCES actions(id),
+        FOREIGN KEY (person_id) REFERENCES people(id),
+        FOREIGN KEY (action_id) REFERENCES actions(id),
         FOREIGN KEY (table_id) REFERENCES tables(id)
     );
     """
     add = """
     INSERT INTO
-        people_rights (person, action, table_id)
+        people_rights (person_id, action_id, table_id)
     VALUES
         (?, ?, ?)
     """
     drop = """DROP TABLE people_rights"""
     select_all = """
     SELECT
-        person, action, table_id
+        person_id, action_id, table_id
     FROM
         people_rights
     """
     select_by_person = """
     SELECT
-        action, table_id
+        action_id, table_id
     FROM
         people_rights
     WHERE
-        person = ?
+        person_id = ?
     """
 
 
@@ -532,35 +549,35 @@ class PEOPLE_RIGHTS:
 class ROLE_RIGHTS:
     make = """
     CREATE TABLE IF NOT EXISTS role_rights (
-        right_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        role INTEGER,
-        action INTEGER,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        role_id INTEGER,
+        action_id INTEGER,
         table_id INTEGER,
-        FOREIGN KEY (role) REFERENCES roles(id),
-        FOREIGN KEY (action) REFERENCES actions(id),
+        FOREIGN KEY (role_id) REFERENCES people_roles(id),
+        FOREIGN KEY (action_id) REFERENCES actions(id),
         FOREIGN KEY (table_id) REFERENCES tables(id)
     );
     """
     add = """
     INSERT INTO
-        role_rights (role, action, table_id)
+        role_rights (role_id, action_id, table_id)
     VALUES
         (?, ?, ?)
     """
     drop = """DROP TABLE role_rights"""
     select_all = """
     SELECT
-        role, action, table_id
+        role_id, action_id, table_id
     FROM
         role_rights
     """
     select_by_role = """
     SELECT
-        action, table_id
+        action_id, table_id
     FROM
         role_rights
     WHERE
-        role = ?
+        role_id = ?
     """
 
 
@@ -573,6 +590,7 @@ class ACTIONS:
         abbreviation TEXT
     );
     """
+    # 'abbreviation' is relic of the past
     add = """
     INSERT INTO
         actions (name, abbreviation)
@@ -605,6 +623,7 @@ class TABLES:
         abbreviation TEXT
     );
     """
+    # 'abbreviation' is relic of the past
     add = """
     INSERT INTO
         tables (name, abbreviation)
@@ -628,6 +647,7 @@ class TABLES:
     """
 
 
+# 'USERNAMES_TG' is relic of the past
 @dataclass
 class USERNAMES_TG:
     make = """

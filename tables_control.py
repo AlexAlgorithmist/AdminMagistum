@@ -211,12 +211,21 @@ class get:
     def all_changes() -> list[tuple[int, int, int, int, int, str]] | DBMS.Error:
         return DBMS.execute_read_query(connection, CHANGES.select_all)
 
+    @staticmethod
+    def change_by_lesson(lesson: int) -> list[tuple[int, int, int, int, str]] | DBMS.Error:
+        return DBMS.execute_read_query_values(connection, CHANGES.change_by_lesson, (lesson,))
+
+    @staticmethod
+    def changes_by_changer(changer: int) -> list[tuple[int, int, int, int, str]] | DBMS.Error:
+        return DBMS.execute_read_query_values(connection, CHANGES.changes_by_changer, (changer,))
+
 
     @staticmethod
     def action_abbreviation_by_id(action_id: int) -> str | DBMS.Error:
         error = DBMS.execute_read_query_values(connection, ACTIONS.get_abbreviation_by_id, (action_id,))
         if type(error) != list:
             return error
+        print(error, action_id)
         return error[0][0]
 
     @staticmethod
